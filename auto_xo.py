@@ -23,7 +23,7 @@ def msgRcv (timestamp, source, groupID, message, attachments):
     print('VIX5', VIX5)
     print('SP Time: ', sptime)
 
-    
+    #hi
     return
 
 from pydbus import SystemBus, SessionBus
