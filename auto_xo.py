@@ -35,4 +35,3 @@ loop = GLib.MainLoop()
 signal = bus.get('org.asamk.Signal._19708232320')
 
 signal.onMessageReceived = msgRcv
-loop.run()
