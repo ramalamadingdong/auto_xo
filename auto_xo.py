@@ -20,9 +20,10 @@ def msgRcv (timestamp, source, groupID, message, attachments):
     if message.isdigit():
         try:
             Auto_XO.update('K' + message, "RETURNED")
-            signal.sendMessage("WELCOME BACK!", [], [source])
+            signal.sendMessage("Welcome Back!!", [], [source])
         except Exception as e:
             print("google sheets problem:", e)
+            signal.sendMessage("Needs Debugging " + str(e), [], ['+17272186609'])
         return
 
     dest = str(re.findall("(?<=DEST: ).*(?=MIS)", message,re.DOTALL)).rstrip()
@@ -33,7 +34,8 @@ def msgRcv (timestamp, source, groupID, message, attachments):
     VIX3 = str(re.findall("(?<=VIX 3: ).*(?=VIX 4)", message,re.DOTALL)).rstrip()
     VIX4 = str(re.findall("(?<=VIX 4: ).*(?=VIX 5)", message,re.DOTALL)).rstrip()
     VIX5 = str(re.findall("(?<=VIX 5: ).*(?=VIX 6)", message,re.DOTALL)).rstrip()
-    sptime = str(timestamp)
+    timestamp = datetime.datetime.fromtimestamp(timestamp/1000.0)
+    sptime = str(timestamp.strftime("%m/%d/%Y, %H:%M"))
 
     print('dest', dest)
     print('mis', miss)
@@ -59,6 +61,7 @@ def msgRcv (timestamp, source, groupID, message, attachments):
         signal.sendMessage("Trip ticket # " + str(n_row) + " filed please reply "+ str(n_row) + " when you return ", [], [source])
     except Exception as e:
         print("google sheets problem:", e)
+        signal.sendMessage("Needs Debugging " + str(e), [], ['+17272186609'])
     return
 
 from pydbus import SystemBus, SessionBus
