@@ -5,7 +5,7 @@ import ast
 
 
 gc = gspread.service_account(filename='creds.json')
-sh = gc.open("188th Manifest")
+sh = gc.open("Trip Tickets")
 Auto_XO = sh.worksheet("Auto_XO")
 
 def next_available_row():
@@ -13,8 +13,17 @@ def next_available_row():
     return str(len(str_list)+1)
 
 def msgRcv (timestamp, source, groupID, message, attachments):
+
     print ("msgRcv called")
     message = str(message).rstrip()
+
+    if message.isdigit():
+        try:
+            Auto_XO.update('K' + message, "RETURNED")
+            signal.sendMessage("WELCOME BACK!", [], [source])
+        except Exception as e:
+            print("google sheets problem:", e)
+        return
 
     dest = str(re.findall("(?<=DEST: ).*(?=MIS)", message,re.DOTALL)).rstrip()
     miss = str(re.findall("(?<=MIS: ).*(?=NCOIC)", message,re.DOTALL)).rstrip()
@@ -47,9 +56,9 @@ def msgRcv (timestamp, source, groupID, message, attachments):
         Auto_XO.update('H' + n_row, VIX3)
         Auto_XO.update('I' + n_row, VIX4)
         Auto_XO.update('J' + n_row, VIX5)
+        signal.sendMessage("Trip ticket # " + str(n_row) + " filed please reply "+ str(n_row) + " when you return ", [], [source])
     except Exception as e:
         print("google sheets problem:", e)
-
     return
 
 from pydbus import SystemBus, SessionBus
