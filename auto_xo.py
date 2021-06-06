@@ -2,7 +2,8 @@ import re
 import gspread
 import datetime
 import ast
-
+from pydbus import SystemBus, SessionBus
+from gi.repository import GLib
 
 gc = gspread.service_account(filename='creds.json')
 sh = gc.open("Trip Tickets")
@@ -15,8 +16,8 @@ def next_available_row():
 def msgRcv (timestamp, source, groupID, message, attachments):
 
     print ("msgRcv called")
-    message = str(message).rstrip()
-
+    message = str(message).replace('\n', ' ').replace('[', '').replace(']', '')
+    
     if message.isdigit():
         try:
             Auto_XO.update('K' + message, "RETURNED")
@@ -26,29 +27,29 @@ def msgRcv (timestamp, source, groupID, message, attachments):
             signal.sendMessage("Needs Debugging " + str(e), [], ['+17272186609'])
         return
 
-    dest = str(re.findall("(?<=DEST: ).*(?=MIS)", message,re.DOTALL)).rstrip()
-    miss = str(re.findall("(?<=MIS: ).*(?=NCOIC)", message,re.DOTALL)).rstrip()
-    ncoic =str( re.findall("(?<=NCOIC: ).*(?=VIX 1)", message,re.DOTALL)).rstrip()
-    if ("VIX 2: " in str(message)):
-        VIX1 = str(re.findall("(?<=VIX 1: ).*(?=VIX 2)", message,re.DOTALL)).rstrip()
+    dest = str(re.findall("(?<=DEST:).*(?=MIS)", message,re.DOTALL)).strip()
+    miss = str(re.findall("(?<=MIS:).*(?=NCOIC)", message,re.DOTALL)).strip()
+    ncoic =str( re.findall("(?<=NCOIC:).*(?=VIX 1)", message,re.DOTALL)).strip()
+    if ("VIX 2:" in str(message)):
+        VIX1 = str(re.findall("(?<=VIX 1:).*(?=VIX 2)", message,re.DOTALL)).strip()
     else:
-        VIX1 = str(re.findall("(?<=VIX 1: ).*", message,re.DOTALL)).rstrip()
-    if ("Vix 3: " in str(message)):
-        VIX2 = str(re.findall("(?<=VIX 2: ).*(?=VIX 3)", message,re.DOTALL)).rstrip()
+        VIX1 = str(re.findall("(?<=VIX 1:).*", message,re.DOTALL)).strip()
+    if ("Vix 3:" in str(message)):
+        VIX2 = str(re.findall("(?<=VIX 2:).*(?=VIX 3)", message,re.DOTALL)).strip()
     else:   
-        VIX2 = str(re.findall("(?<=VIX 2: ).*", message,re.DOTALL)).rstrip()
-    if ("Vix 4: " in str(message)):
-        VIX3 = str(re.findall("(?<=VIX 3: ).*(?=VIX 4)", message,re.DOTALL)).rstrip()
+        VIX2 = str(re.findall("(?<=VIX 2:).*", message,re.DOTALL)).strip()
+    if ("Vix 4:" in str(message)):
+        VIX3 = str(re.findall("(?<=VIX 3:).*(?=VIX 4)", message,re.DOTALL)).strip()
     else:
-        VIX3 = str(re.findall("(?<=VIX 3: ).*", message,re.DOTALL)).rstrip()
-    if ("Vix 5: " in str(message)):
-        VIX4 = str(re.findall("(?<=VIX 4: ).*(?=VIX 5)", message,re.DOTALL)).rstrip()
+        VIX3 = str(re.findall("(?<=VIX 3:).*", message,re.DOTALL)).strip()
+    if ("Vix 5:" in str(message)):
+        VIX4 = str(re.findall("(?<=VIX 4:).*(?=VIX 5)", message,re.DOTALL)).strip()
     else:
-        VIX4 = str(re.findall("(?<=VIX 4: ).*", message,re.DOTALL)).rstrip()
+        VIX4 = str(re.findall("(?<=VIX 4:).*", message,re.DOTALL)).strip()
 
-    VIX5 = str(re.findall("(?<=VIX 5: ).*", message,re.DOTALL)).rstrip()
+    VIX5 = str(re.findall("(?<=VIX 5:).*", message,re.DOTALL)).strip()
     timestamp = datetime.datetime.fromtimestamp(timestamp/1000.0)
-    sptime = str(timestamp.strftime("%m/%d/%Y, %H:%M"))
+    sptime = str(timestamp.strftime("%m/%d, %H:%M"))
 
     print('dest', dest)
     print('mis', miss)
@@ -63,8 +64,8 @@ def msgRcv (timestamp, source, groupID, message, attachments):
         n_row = next_available_row()
         Auto_XO.update('A' + n_row, str(n_row))
         Auto_XO.update('B' + n_row, str(sptime))
-        Auto_XO.update('C' + n_row, dest)
-        Auto_XO.update('D' + n_row, miss)
+        Auto_XO.update('C' + n_row, dest.strip())
+        Auto_XO.update('D' + n_row, miss.r)
         Auto_XO.update('E' + n_row, ncoic)
         Auto_XO.update('F' + n_row, VIX1)
         Auto_XO.update('G' + n_row, VIX2)
@@ -76,9 +77,6 @@ def msgRcv (timestamp, source, groupID, message, attachments):
         print("google sheets problem:", e)
         signal.sendMessage("Needs Debugging " + str(e), [], ['+17272186609'])
     return
-
-from pydbus import SystemBus, SessionBus
-from gi.repository import GLib
 
 bus = SessionBus()
 loop = GLib.MainLoop()
