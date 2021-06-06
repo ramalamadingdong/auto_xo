@@ -14,8 +14,6 @@ def next_available_row():
     return str(len(str_list)+1)
 
 def msgRcv (timestamp, source, groupID, message, attachments):
-
-    print ("msgRcv called")
     try:
         message = str(message).replace('\n', ' ').replace('[', '').replace(']', '').strip()
 
