@@ -29,11 +29,24 @@ def msgRcv (timestamp, source, groupID, message, attachments):
     dest = str(re.findall("(?<=DEST: ).*(?=MIS)", message,re.DOTALL)).rstrip()
     miss = str(re.findall("(?<=MIS: ).*(?=NCOIC)", message,re.DOTALL)).rstrip()
     ncoic =str( re.findall("(?<=NCOIC: ).*(?=VIX 1)", message,re.DOTALL)).rstrip()
-    VIX1 = str(re.findall("(?<=VIX 1: ).*(?=VIX 2)", message,re.DOTALL)).rstrip()
-    VIX2 = str(re.findall("(?<=VIX 2: ).*(?=VIX 3)", message,re.DOTALL)).rstrip()
-    VIX3 = str(re.findall("(?<=VIX 3: ).*(?=VIX 4)", message,re.DOTALL)).rstrip()
-    VIX4 = str(re.findall("(?<=VIX 4: ).*(?=VIX 5)", message,re.DOTALL)).rstrip()
-    VIX5 = str(re.findall("(?<=VIX 5: ).*(?=VIX 6)", message,re.DOTALL)).rstrip()
+    if ("VIX 2: " in str(message)):
+        VIX1 = str(re.findall("(?<=VIX 1: ).*(?=VIX 2)", message,re.DOTALL)).rstrip()
+    else:
+        VIX1 = str(re.findall("(?<=VIX 1: ).*", message,re.DOTALL)).rstrip()
+    if ("Vix 3: " in str(message)):
+        VIX2 = str(re.findall("(?<=VIX 2: ).*(?=VIX 3)", message,re.DOTALL)).rstrip()
+    else:   
+        VIX2 = str(re.findall("(?<=VIX 2: ).*", message,re.DOTALL)).rstrip()
+    if ("Vix 4: " in str(message)):
+        VIX3 = str(re.findall("(?<=VIX 3: ).*(?=VIX 4)", message,re.DOTALL)).rstrip()
+    else:
+        VIX3 = str(re.findall("(?<=VIX 3: ).*", message,re.DOTALL)).rstrip()
+    if ("Vix 5: " in str(message)):
+        VIX4 = str(re.findall("(?<=VIX 4: ).*(?=VIX 5)", message,re.DOTALL)).rstrip()
+    else:
+        VIX4 = str(re.findall("(?<=VIX 4: ).*", message,re.DOTALL)).rstrip()
+
+    VIX5 = str(re.findall("(?<=VIX 5: ).*", message,re.DOTALL)).rstrip()
     timestamp = datetime.datetime.fromtimestamp(timestamp/1000.0)
     sptime = str(timestamp.strftime("%m/%d/%Y, %H:%M"))
 
